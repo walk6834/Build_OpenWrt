@@ -3,7 +3,7 @@
 OPENWRT_REPO=immortalwrt/immortalwrt
 OPENWRT_BRANCH=openwrt-25.12
 OPENWRT_DIR=immortalwrt
-TARGET_ARCH=x86_64
+TARGET_ARCH=x86-64
 
 
 echo "开始克隆OpenWrt仓库..."
