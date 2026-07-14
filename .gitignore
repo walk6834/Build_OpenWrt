@@ -1,0 +1,12 @@
+# idea
+.idea/
+.history/
+
+# claude
+.claude/settings.local.json
+
+# 临时文件
+tmp/
+
+# 日志
+logs/
