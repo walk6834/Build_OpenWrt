@@ -55,7 +55,7 @@ jobs:
         run: |
           git clone -b ${{env.OPENWRT_BRANCH}} --single-branch --depth 1 https://github.com/${{env.OPENWRT_REPO}}.git ${{env.OPENWRT_DIR}}
 
-      - name: 复制自定义文件到OpenWrt目录
+      - name: 复制自定义文件
         run: |
           cp -r x86-64/* ${{env.OPENWRT_DIR}}
           chmod +x ${{env.OPENWRT_DIR}}/files/etc/uci-defaults/*.sh
