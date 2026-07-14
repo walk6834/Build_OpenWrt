@@ -4,8 +4,8 @@ on:
   workflow_dispatch:
 
 env:
-  REPO_URL: immortalwrt/immortalwrt
-  REPO_BRANCH: openwrt-25.12
+  OPENWRT_REPO: immortalwrt/immortalwrt
+  OPENWRT_BRANCH: openwrt-25.12
   OPENWRT_DIR: immortalwrt
   TZ: Asia/Shanghai
 
