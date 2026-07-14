@@ -28,7 +28,7 @@ jobs:
           chmod +x scripts/check.sh
           ./scripts/check.sh
 
-      - name: Free disk space
+      - name: 清理磁盘空间
         uses: jlumbroso/free-disk-space@main
         with:
           tool-cache: false
