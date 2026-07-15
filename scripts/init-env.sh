@@ -15,3 +15,6 @@ sudo apt install -y ack antlr3 asciidoc autoconf automake autopoint binutils bis
 sudo apt clean
 sudo apt autoremove -y
 sudo rm -rf /var/lib/apt/lists/* /var/cache/apt/*
+
+# 设置时区
+[ -n "${TZ:-}" ] && sudo timedatectl set-timezone "$TZ"

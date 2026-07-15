@@ -8,6 +8,9 @@ env:
   OPENWRT_BRANCH: openwrt-25.12
   OPENWRT_DIR: openwrt
   UPLOAD_DIR: upload
+  PART_SIZE: 1024
+  IP_ADDRESS: 192.168.10.1
+  CONFIG_FILE: default.config
   TZ: Asia/Shanghai
 
 jobs:
@@ -26,8 +29,7 @@ jobs:
 
       - name: 当前环境信息
         run: |
-          chmod +x scripts/check.sh
-          ./scripts/check.sh
+          chmod +x scripts/check.sh && ./scripts/check.sh
 
       - name: 清理磁盘空间
         uses: jlumbroso/free-disk-space@main
@@ -48,9 +50,7 @@ jobs:
 
       - name: 初始化环境
         run: |
-          chmod +x scripts/init-env.sh
-          ./scripts/init-env.sh
-          sudo timedatectl set-timezone ${{env.TZ}}
+          chmod +x scripts/init-env.sh && ./scripts/init-env.sh
 
       - name: 克隆OpenWrt源码
         run: |
@@ -69,8 +69,18 @@ jobs:
       - name: 生成配置文件
         run: |
           cd ${{env.OPENWRT_DIR}}
-          cp default.config .config 
+          [ -e "$CONFIG_FILE" ] && cp -f "$CONFIG_FILE" .config
           make defconfig
+
+      - name: 设置环境变量
+        run: |
+          cd ${{env.OPENWRT_DIR}}
+          chmod +x ./custom_scripts/set_variable_values.sh && ./custom_scripts/set_variable_values.sh
+
+      - name: 应用自定义设置
+        run: |
+          cd ${{env.OPENWRT_DIR}}
+          chmod +x ./custom_scripts/apply_custom_settings.sh && ./custom_scripts/apply_custom_settings.sh
 
       - name: 下载依赖包
         id: download
@@ -82,7 +92,6 @@ jobs:
         id: compile
         run: |
           cd ${{env.OPENWRT_DIR}}
-          echo "KERNEL_VERSION=$(grep -oP 'LINUX_VERSION:=\K.*' include/kernel.mk)" >> $GITHUB_ENV
           echo -e "$(($(nproc) + 1)) thread compile"
           make -j $(($(nproc)+1)) V=s || make -j1 V=s
           echo "status=success" >> $GITHUB_OUTPUT
@@ -128,11 +137,11 @@ jobs:
           body: |
             **This is ${{env.OPENWRT_BRANCH}} firmware for x86-64**
             ### 📒 固件信息
-            - 💻 平台架构: x86-64
+            - 💻 平台架构: ${{env.TARGET_NAME}}-${{env.SUBTARGET_NAME_NAME}}
             - ⚽ 固件源码: https://github.com/${{env.OPENWRT_REPO}}
             - 💝 源码分支: ${{env.OPENWRT_BRANCH}}
             - 🚀 内核版本: ${{env.KERNEL_VERSION}}
-            - 🌐 默认地址: 192.168.10.1
+            - 🌐 默认地址: ${{env.IP_ADDRESS}}
             - 🔑 默认密码: password
 
   Delete_Workflow:
