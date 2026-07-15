@@ -106,14 +106,7 @@ jobs:
         if: steps.compile.outputs.status == 'success' && !cancelled()
         run: |
           cd ${{env.OPENWRT_DIR}}
-          mkdir -p ${{env.UPLOAD_DIR}}
-
-          cp -rf .config ${{env.UPLOAD_DIR}}/
-
-          ROOTFS_TAR_GZ=$(find ./bin/targets/ -type f -name "*wrt-*-rootfs.tar.gz" 2>/dev/null | head -n1)
-          SQUASHFS_IMG_GZ=$(find ./bin/targets/ -type f -name "*wrt-*-squashfs.img.gz" 2>/dev/null | head -n1)
-          mv $ROOTFS_TAR_GZ ${{env.UPLOAD_DIR}}/
-          mv $SQUASHFS_IMG_GZ ${{env.UPLOAD_DIR}}/
+          chmod +x ./custom_scripts/collect_upload.sh && ./custom_scripts/collect_upload.sh
 
       - name: 上传固件到Artifacts
         if: steps.compile.outputs.status == 'success' && !cancelled()
