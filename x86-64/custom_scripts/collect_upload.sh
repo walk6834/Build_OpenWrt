@@ -1,9 +1,9 @@
 #!/bin/sh
 
-SQUASHFS_IMG_GZ=$(find ./bin/targets/ -type f -name "*wrt*.img.gz" 2>/dev/null)
+mkdir -p "$GITHUB_WORKSPACE/$UPLOAD_DIR"
 
-mkdir -p $GITHUB_WORKSPACE/$UPLOAD_DIR
+cp -f .config "$GITHUB_WORKSPACE/$UPLOAD_DIR/"
 
-cp -rf .config "$GITHUB_WORKSPACE/$UPLOAD_DIR/"
+# 查找并移动所有匹配的 img.gz 文件
+find ./bin/targets/ -type f -name "*wrt*.img.gz" -exec mv {} "$GITHUB_WORKSPACE/$UPLOAD_DIR/" \; 2>/dev/null
 
-[ -f "$SQUASHFS_IMG_GZ" ] && mv "$SQUASHFS_IMG_GZ" "$GITHUB_WORKSPACE/$UPLOAD_DIR/" || echo "未找到 img 文件，跳过"
