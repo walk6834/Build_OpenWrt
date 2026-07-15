@@ -115,14 +115,12 @@ jobs:
 
       - name: 上传固件到Releases
         if: steps.compile.outputs.status == 'success' && !cancelled()
-        uses: ncipollo/release-action@main
+        uses: softprops/action-gh-release@v3.0.2
         with:
           name: ${{env.OPENWRT_BRANCH}}-${{env.COMPILE_DATE}}
-          allowUpdates: true
-          removeArtifacts: true
-          tag: ${{env.OPENWRT_BRANCH}}-${{env.COMPILE_DATE}}
           token: ${{secrets.GITHUB_TOKEN}}
-          artifacts: ${{env.UPLOAD_DIR}}/*
+          files: |
+            ${{ github.workspace }}/${{env.UPLOAD_DIR}}/*
           body: |
             **This is ${{env.OPENWRT_BRANCH}} firmware for ${{matrix.target}}**
             ### 📒 固件信息
