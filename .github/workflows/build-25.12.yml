@@ -91,16 +91,15 @@ jobs:
       - name: 编译固件
         id: compile
         run: |
-          echo "KERNEL_VERSION=$(cat ${{env.OPENWRT_DIR}}/include/kernel-version)" >> $GITHUB_ENV
-
           cd ${{env.OPENWRT_DIR}}
+          echo "KERNEL_VERSION=$(grep -oP 'LINUX_VERSION:=\K.*' include/kernel.mk)" >> $GITHUB_ENV
           echo -e "$(($(nproc) + 1)) thread compile"
           make -j $(($(nproc)+1)) V=s || make -j1 V=s
           echo "status=success" >> $GITHUB_OUTPUT
           echo "COMPILE_DATE=$(date +"%Y%m%d")" >> $GITHUB_ENV
           echo "COMPILE_TIME=$(date +"%Y%m%d%H%M")" >> $GITHUB_ENV
 
-      - name: 清理磁盘空间完成
+      - name: 编译后磁盘使用情况
         run: |
           echo "硬盘使用情况:"
           df -hT
