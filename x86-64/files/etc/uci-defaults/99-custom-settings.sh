@@ -1,5 +1,8 @@
 #!/bin/sh
 
+# 记录所有操作到 /tmp/setup.log
+#exec >/tmp/setup.log 2>&1
+
 # 系统后台密码（为空则不修改）
 root_password="password"
 
