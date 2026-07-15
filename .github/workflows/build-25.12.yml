@@ -57,13 +57,13 @@ jobs:
 
       - name: 复制自定义文件
         run: |
-          cp -r $GITHUB_WORKSPACE/x86-64/* ${{env.OPENWRT_DIR}}/
+          cp -r $GITHUB_WORKSPACE/${{matrix.target}}/* ${{env.OPENWRT_DIR}}/
           chmod +x ${{env.OPENWRT_DIR}}/files/etc/uci-defaults/*.sh
+          chmod +x ${{env.OPENWRT_DIR}}/custom_scripts/*.sh
 
       - name: 更新&安装插件
         run: |
-          cd ${{env.OPENWRT_DIR}}
-          chmod +x ./custom_scripts/apply_custom_feeds.sh && ./custom_scripts/apply_custom_feeds.sh
+          ./${{env.OPENWRT_DIR}}/custom_scripts/apply_custom_feeds.sh
 
       - name: 生成配置文件
         run: |
@@ -73,13 +73,11 @@ jobs:
 
       - name: 设置环境变量
         run: |
-          cd ${{env.OPENWRT_DIR}}
-          chmod +x ./custom_scripts/set_variable_values.sh && ./custom_scripts/set_variable_values.sh
+          ./${{env.OPENWRT_DIR}}/custom_scripts/set_variable_values.sh
 
       - name: 应用自定义设置
         run: |
-          cd ${{env.OPENWRT_DIR}}
-          chmod +x ./custom_scripts/apply_custom_settings.sh && ./custom_scripts/apply_custom_settings.sh
+          ./${{env.OPENWRT_DIR}}/custom_scripts/set_variable_values.sh
 
       - name: 下载依赖包
         id: download
@@ -105,8 +103,7 @@ jobs:
       - name: 组织编译后的固件
         if: steps.compile.outputs.status == 'success' && !cancelled()
         run: |
-          cd ${{env.OPENWRT_DIR}}
-          chmod +x ./custom_scripts/collect_upload.sh && ./custom_scripts/collect_upload.sh
+          ./${{env.OPENWRT_DIR}}/custom_scripts/collect_upload.sh
 
       - name: 上传固件到Artifacts
         if: steps.compile.outputs.status == 'success' && !cancelled()
@@ -127,7 +124,7 @@ jobs:
           token: ${{secrets.GITHUB_TOKEN}}
           artifacts: ${{env.UPLOAD_DIR}}/*
           body: |
-            **This is ${{env.OPENWRT_BRANCH}} firmware for x86-64**
+            **This is ${{env.OPENWRT_BRANCH}} firmware for ${{matrix.target}}**
             ### 📒 固件信息
             - 💻 平台架构: ${{env.TARGET_NAME}}-${{env.SUBTARGET_NAME_NAME}}
             - ⚽ 固件源码: https://github.com/${{env.OPENWRT_REPO}}
