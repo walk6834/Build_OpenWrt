@@ -1,7 +1,5 @@
 #!/bin/sh
 
-[ -e "$GITHUB_WORKSPACE/files" ] && mv "$GITHUB_WORKSPACE/files" files
-
 # 设置固件rootfs大小
 if [ -n "${PART_SIZE:-}" ]; then
     sed -i '/ROOTFS_PARTSIZE/d' .config
