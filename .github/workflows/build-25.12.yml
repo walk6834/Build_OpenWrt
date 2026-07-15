@@ -113,7 +113,8 @@ jobs:
         uses: actions/upload-artifact@main
         with:
           name: ${{env.OPENWRT_BRANCH}}-${{env.COMPILE_DATE}}
-          path: ${{env.UPLOAD_DIR}}
+          path: ${{env.UPLOAD_DIR}}/
+          overwrite: true
 
       - name: 上传固件到Releases
         if: steps.compile.outputs.status == 'success' && !cancelled()
