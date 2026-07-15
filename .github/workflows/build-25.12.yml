@@ -6,7 +6,8 @@ on:
 env:
   OPENWRT_REPO: immortalwrt/immortalwrt
   OPENWRT_BRANCH: openwrt-25.12
-  OPENWRT_DIR: immortalwrt
+  OPENWRT_DIR: openwrt
+  UPLOAD_DIR: upload
   TZ: Asia/Shanghai
 
 jobs:
@@ -57,26 +58,15 @@ jobs:
 
       - name: 复制自定义文件
         run: |
-          cp -r x86-64/* ${{env.OPENWRT_DIR}}
+          cp -r $GITHUB_WORKSPACE/x86-64/* ${{env.OPENWRT_DIR}}/
           chmod +x ${{env.OPENWRT_DIR}}/files/etc/uci-defaults/*.sh
 
-      - name: 配置OpenWrt Feeds
+      - name: 更新&安装插件
         run: |
           cd ${{env.OPENWRT_DIR}}
-          chmod +x ./init-feeds.sh
-          ./init-feeds.sh
+          chmod +x ./custom_scripts/apply_custom_feeds.sh && ./custom_scripts/apply_custom_feeds.sh
 
-      - name: 更新OpenWrt Feeds
-        run: |
-          cd ${{env.OPENWRT_DIR}}
-          ./scripts/feeds update -a
-
-      - name: 安装OpenWrt Feeds
-        run: |
-          cd ${{env.OPENWRT_DIR}}
-          ./scripts/feeds install -a
-
-      - name: 生成默认配置文件
+      - name: 生成配置文件
         run: |
           cd ${{env.OPENWRT_DIR}}
           cp default.config .config 
@@ -109,18 +99,21 @@ jobs:
         if: steps.compile.outputs.status == 'success' && !cancelled()
         run: |
           cd ${{env.OPENWRT_DIR}}
-          mkdir -p upload
+          mkdir -p ${{env.UPLOAD_DIR}}
 
-          cp -rf .config upload/
-          mv bin/targets/x86/64/immortalwrt-x86-64-generic-rootfs.tar.gz upload/immortalwrt-x86-64-generic-rootfs-${{env.COMPILE_TIME}}.tar.gz
-          mv bin/targets/x86/64/immortalwrt-x86-64-generic-squashfs-combined-efi.img.gz upload/immortalwrt-x86-64-generic-squashfs-combined-efi-${{env.COMPILE_TIME}}.img.gz
+          cp -rf .config ${{env.UPLOAD_DIR}}/
+
+          ROOTFS_TAR_GZ=$(find ./bin/targets/ -type f -name "*wrt-*-rootfs.tar.gz" 2>/dev/null | head -n1)
+          SQUASHFS_IMG_GZ=$(find ./bin/targets/ -type f -name "*wrt-*-squashfs.img.gz" 2>/dev/null | head -n1)
+          mv $ROOTFS_TAR_GZ ${{env.UPLOAD_DIR}}/
+          mv $SQUASHFS_IMG_GZ ${{env.UPLOAD_DIR}}/
 
       - name: 上传固件到Artifacts
         if: steps.compile.outputs.status == 'success' && !cancelled()
         uses: actions/upload-artifact@main
         with:
           name: ${{env.OPENWRT_BRANCH}}-${{env.COMPILE_DATE}}
-          path: upload
+          path: ${{env.UPLOAD_DIR}}
 
       - name: 上传固件到Releases
         if: steps.compile.outputs.status == 'success' && !cancelled()
@@ -131,7 +124,7 @@ jobs:
           removeArtifacts: true
           tag: ${{env.OPENWRT_BRANCH}}-${{env.COMPILE_DATE}}
           token: ${{secrets.GITHUB_TOKEN}}
-          artifacts: upload/*
+          artifacts: ${{env.UPLOAD_DIR}}/*
           body: |
             **This is ${{env.OPENWRT_BRANCH}} firmware for x86-64**
             ### 📒 固件信息
@@ -141,9 +134,6 @@ jobs:
             - 🚀 内核版本: ${{env.KERNEL_VERSION}}
             - 🌐 默认地址: 192.168.10.1
             - 🔑 默认密码: password
-            ### 🧊 固件版本
-            - 固件编译前最后一次→[主源码](https://github.com/${{env.OPENWRT_REPO}})更新记录
-            - ${{env.COMPILE_DATE}}
 
   Delete_Workflow:
     needs: [OpenWrt_Builder]
