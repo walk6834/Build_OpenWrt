@@ -2,27 +2,60 @@ name: OpenWrt 25.12 Builder
 
 on:
   workflow_dispatch:
+    inputs:
+      repo_name:
+        description: "选择要编译的源码"
+        required: true
+        default: "immortalwrt/immortalwrt"
+        type: choice
+        options: ["immortalwrt/immortalwrt"]
+
+      repo_branch:
+        description: "选择要编译的分支"
+        required: true
+        default: "openwrt-25.12"
+
+      ip_address:
+        description: "设置默认IP地址"
+        required: false
+        default: "192.168.10.1"
+
+      partsize:
+        description: "设置rootfs大小"
+        required: false
+        default: "1024"
+
+      artifact:
+        description: "上传固件到Artifact"
+        required: false
+        default: true
+        type: boolean
+
+      release:
+        description: "上传固件到Releases"
+        required: false
+        default: true
+        type: boolean
 
 env:
-  OPENWRT_REPO: immortalwrt/immortalwrt
-  OPENWRT_BRANCH: openwrt-25.12
-  OPENWRT_DIR: openwrt
-  UPLOAD_DIR: upload
-  PART_SIZE: 1024
-  IP_ADDRESS: 192.168.10.1
   CONFIG_FILE: default.config
-  PASSWORD: password
   TZ: Asia/Shanghai
 
 jobs:
   OpenWrt_Builder:
     runs-on: ubuntu-latest
 
-    # strategy:
-    #   fail-fast: false
-    #   matrix:
-    #     target:
-    #       - x86-64
+    env:
+      OPENWRT_REPO: ${{inputs.repo_name}}
+      OPENWRT_BRANCH: ${{inputs.repo_branch}}
+      PART_SIZE: ${{inputs.partsize}}
+      IP_ADDRESS: ${{inputs.ip_address}}
+      PASSWORD: password
+      OPENWRT_DIR: openwrt
+      UPLOAD_DIR: upload
+      CONFIG_FILE: default.config
+      UPLOAD_ARTIFACT: ${{inputs.artifact}}
+      UPLOAD_RELEASE: ${{inputs.release}}
 
     steps:
       - name: 克隆仓库
@@ -107,7 +140,7 @@ jobs:
           cd ${{env.OPENWRT_DIR}} && ./custom_scripts/collect_upload.sh
 
       - name: 上传固件到Artifacts
-        if: steps.compile.outputs.status == 'success' && !cancelled()
+        if: steps.compile.outputs.status == 'success' && !cancelled() && env.UPLOAD_ARTIFACT == 'true'
         uses: actions/upload-artifact@main
         with:
           name: ${{env.OPENWRT_BRANCH}}-${{env.COMPILE_DATE}}
@@ -115,7 +148,7 @@ jobs:
           overwrite: true
 
       - name: 上传固件到Releases
-        if: steps.compile.outputs.status == 'success' && !cancelled()
+        if: steps.compile.outputs.status == 'success' && !cancelled() && env.UPLOAD_RELEASE == 'true'
         uses: softprops/action-gh-release@v3.0.2
         with:
           name: ${{env.OPENWRT_BRANCH}}-${{env.COMPILE_DATE}}
