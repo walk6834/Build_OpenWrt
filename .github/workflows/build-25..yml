@@ -131,6 +131,36 @@ jobs:
             - password
           overwrite: true
 
+      - name: 上传固件到Artifacts
+        if: steps.compile.outputs.status == 'success' && !cancelled()
+        uses: actions/upload-artifact@main
+        with:
+          name: ${{env.OPENWRT_BRANCH}}-${{env.COMPILE_DATE}}
+          path: upload
+
+      - name: 上传固件到Releases
+        if: steps.compile.outputs.status == 'success' && !cancelled()
+        uses: ncipollo/release-action@main
+        with:
+          name: ${{env.OPENWRT_BRANCH}}-${{env.COMPILE_DATE}}
+          allowUpdates: true
+          removeArtifacts: true
+          tag: ${{env.OPENWRT_BRANCH}}-${{env.COMPILE_DATE}}
+          token: ${{secrets.GITHUB_TOKEN}}
+          artifacts: upload/*
+          body: |
+            **This is ${{env.OPENWRT_BRANCH}} firmware for x86-64**
+            ### 📒 固件信息
+            - 💻 平台架构: x86-64
+            - ⚽ 固件源码: https://github.com/${{env.OPENWRT_REPO}}
+            - 💝 源码分支: ${{env.OPENWRT_BRANCH}}
+            - 🚀 内核版本: 
+            - 🌐 默认地址: 192.168.10.1
+            - 🔑 默认密码: password
+            ### 🧊 固件版本
+            - 固件编译前最后一次→[主源码](https://github.com/${{env.OPENWRT_REPO}})更新记录
+            - ${{env.COMPILE_DATE}}
+
   Delete_Workflow:
     needs: [OpenWrt_Builder]
     runs-on: ubuntu-latest
