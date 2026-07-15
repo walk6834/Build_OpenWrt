@@ -86,11 +86,13 @@ jobs:
         id: download
         run: |
           cd ${{env.OPENWRT_DIR}}
-          make download -j $(($(nproc)+1)) V=s
+          make download -j $(($(nproc)+1)) V=s || make download -j1 V=s
 
       - name: 编译固件
         id: compile
         run: |
+          echo "KERNEL_VERSION=$(cat ${{env.OPENWRT_DIR}}/include/kernel-version)" >> $GITHUB_ENV
+
           cd ${{env.OPENWRT_DIR}}
           echo -e "$(($(nproc) + 1)) thread compile"
           make -j $(($(nproc)+1)) V=s || make -j1 V=s
@@ -113,23 +115,6 @@ jobs:
           cp -rf .config upload/
           mv bin/targets/x86/64/immortalwrt-x86-64-generic-rootfs.tar.gz upload/immortalwrt-x86-64-generic-rootfs-${{env.COMPILE_TIME}}.tar.gz
           mv bin/targets/x86/64/immortalwrt-x86-64-generic-squashfs-combined-efi.img.gz upload/immortalwrt-x86-64-generic-squashfs-combined-efi-${{env.COMPILE_TIME}}.img.gz
-
-      - name: 上传固件到Releases
-        if: steps.compile.outputs.status == 'success' && !cancelled()
-        uses: svenstaro/upload-release-action@v2
-        with:
-          repo_token: ${{secrets.GITHUB_TOKEN}}
-          file_glob: true
-          file: upload/*
-          tag: ${{env.OPENWRT_BRANCH}}-${{env.COMPILE_DATE}}
-          body: |
-            # IP
-            - immortalwrt: 192.168.10.1
-            # username
-            - root
-            # password
-            - password
-          overwrite: true
 
       - name: 上传固件到Artifacts
         if: steps.compile.outputs.status == 'success' && !cancelled()
@@ -154,7 +139,7 @@ jobs:
             - 💻 平台架构: x86-64
             - ⚽ 固件源码: https://github.com/${{env.OPENWRT_REPO}}
             - 💝 源码分支: ${{env.OPENWRT_BRANCH}}
-            - 🚀 内核版本: 
+            - 🚀 内核版本: ${{env.KERNEL_VERSION}}
             - 🌐 默认地址: 192.168.10.1
             - 🔑 默认密码: password
             ### 🧊 固件版本
@@ -168,5 +153,6 @@ jobs:
       - name: 删除旧的工作流运行记录
         uses: Mattraks/delete-workflow-runs@v2
         with:
+          token: ${{ secrets.GITHUB_TOKEN }}
           retain_days: 0
           keep_minimum_runs: 2
