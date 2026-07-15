@@ -20,7 +20,7 @@ echo "切换到OpenWrt目录..."
 cd $OPENWRT_DIR
 
 echo "更新feeds并安装..."
-./custom_scripts/apply_feeds.sh
+./custom_scripts/apply_custom_feeds.sh
 
 echo "生辰默认配置..."
 cp default.config .config
