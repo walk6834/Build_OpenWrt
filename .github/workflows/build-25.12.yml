@@ -63,7 +63,7 @@ jobs:
 
       - name: 更新&安装插件
         run: |
-          ./${{env.OPENWRT_DIR}}/custom_scripts/apply_custom_feeds.sh
+          cd ${{env.OPENWRT_DIR}} && ./custom_scripts/apply_custom_feeds.sh
 
       - name: 生成配置文件
         run: |
@@ -73,11 +73,11 @@ jobs:
 
       - name: 设置环境变量
         run: |
-          ./${{env.OPENWRT_DIR}}/custom_scripts/set_variable_values.sh
+          cd ${{env.OPENWRT_DIR}} && ./custom_scripts/set_variable_values.sh
 
       - name: 应用自定义设置
         run: |
-          ./${{env.OPENWRT_DIR}}/custom_scripts/set_variable_values.sh
+          cd ${{env.OPENWRT_DIR}} && ./custom_scripts/apply_custom_settings.sh
 
       - name: 下载依赖包
         id: download
@@ -103,7 +103,7 @@ jobs:
       - name: 组织编译后的固件
         if: steps.compile.outputs.status == 'success' && !cancelled()
         run: |
-          ./${{env.OPENWRT_DIR}}/custom_scripts/collect_upload.sh
+          cd ${{env.OPENWRT_DIR}} && ./custom_scripts/collect_upload.sh
 
       - name: 上传固件到Artifacts
         if: steps.compile.outputs.status == 'success' && !cancelled()
