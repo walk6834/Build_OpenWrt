@@ -11,17 +11,18 @@ env:
   PART_SIZE: 1024
   IP_ADDRESS: 192.168.10.1
   CONFIG_FILE: default.config
+  PASSWORD: password
   TZ: Asia/Shanghai
 
 jobs:
   OpenWrt_Builder:
     runs-on: ubuntu-latest
 
-    strategy:
-      fail-fast: false
-      matrix:
-        target:
-          - x86-64
+    # strategy:
+    #   fail-fast: false
+    #   matrix:
+    #     target:
+    #       - x86-64
 
     steps:
       - name: 克隆仓库
@@ -57,7 +58,7 @@ jobs:
 
       - name: 复制自定义文件
         run: |
-          cp -rf $GITHUB_WORKSPACE/${{matrix.target}}/* ${{env.OPENWRT_DIR}}/
+          cp -rf $GITHUB_WORKSPACE/x86-64/* ${{env.OPENWRT_DIR}}/
           chmod +x ${{env.OPENWRT_DIR}}/files/etc/uci-defaults/*.sh
           chmod +x ${{env.OPENWRT_DIR}}/custom_scripts/*.sh
 
@@ -122,9 +123,7 @@ jobs:
           files: |
             ${{ github.workspace }}/${{env.UPLOAD_DIR}}/*
           body: |
-            **This is ${{env.OPENWRT_BRANCH}} firmware for ${{matrix.target}}**
-            ### 📒 固件信息
-            - 💻 平台架构: ${{env.TARGET_NAME}}-${{env.SUBTARGET_NAME_NAME}}
+            ## 📒 固件信息
             - ⚽ 固件源码: https://github.com/${{env.OPENWRT_REPO}}
             - 💝 源码分支: ${{env.OPENWRT_BRANCH}}
             - 🚀 内核版本: ${{env.KERNEL_VERSION}}
