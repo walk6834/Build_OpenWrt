@@ -121,7 +121,7 @@ jobs:
           repo_token: ${{secrets.GITHUB_TOKEN}}
           file_glob: true
           file: upload/*
-          tag: ${{env.REPO_BRANCH}}-${{env.COMPILE_DATE}}
+          tag: ${{env.OPENWRT_BRANCH}}-${{env.COMPILE_DATE}}
           body: |
             # IP
             - immortalwrt: 192.168.10.1
