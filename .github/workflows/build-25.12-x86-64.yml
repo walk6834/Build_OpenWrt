@@ -20,18 +20,18 @@ on:
         required: false
         default: "192.168.10.1"
 
-      partsize:
+      part_size:
         description: "设置rootfs大小"
         required: false
         default: "1024"
 
-      artifact:
+      upload_artifact:
         description: "上传固件到Artifact"
         required: false
         default: true
         type: boolean
 
-      release:
+      upload_release:
         description: "上传固件到Releases"
         required: false
         default: true
@@ -48,14 +48,14 @@ jobs:
     env:
       OPENWRT_REPO: ${{inputs.repo_name}}
       OPENWRT_BRANCH: ${{inputs.repo_branch}}
-      PART_SIZE: ${{inputs.partsize}}
+      PART_SIZE: ${{inputs.part_size}}
       IP_ADDRESS: ${{inputs.ip_address}}
       PASSWORD: password
       OPENWRT_DIR: openwrt
       UPLOAD_DIR: upload
       CONFIG_FILE: default.config
-      UPLOAD_ARTIFACT: ${{inputs.artifact}}
-      UPLOAD_RELEASE: ${{inputs.release}}
+      UPLOAD_ARTIFACT: ${{inputs.upload_artifact}}
+      UPLOAD_RELEASE: ${{inputs.upload_release}}
 
     steps:
       - name: 克隆仓库
