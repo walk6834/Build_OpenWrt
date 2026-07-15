@@ -57,7 +57,7 @@ jobs:
 
       - name: 复制自定义文件
         run: |
-          cp -r $GITHUB_WORKSPACE/${{matrix.target}}/* ${{env.OPENWRT_DIR}}/
+          cp -rf $GITHUB_WORKSPACE/${{matrix.target}}/* ${{env.OPENWRT_DIR}}/
           chmod +x ${{env.OPENWRT_DIR}}/files/etc/uci-defaults/*.sh
           chmod +x ${{env.OPENWRT_DIR}}/custom_scripts/*.sh
 
