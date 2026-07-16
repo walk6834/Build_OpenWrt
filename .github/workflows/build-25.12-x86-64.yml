@@ -41,6 +41,9 @@ env:
   CONFIG_FILE: default.config
   TZ: Asia/Shanghai
 
+permissions:
+  contents: write
+
 jobs:
   OpenWrt_Builder:
     runs-on: ubuntu-latest
