@@ -7,17 +7,17 @@
 root_password="password"
 
 # LAN 的 IPv4 地址
-# lan_ip_address="192.168.10.1"
+lan_ip_address=""
 
 # 修改root 密码
 if [ -n "$root_password" ]; then
     (echo "$root_password"; sleep 1; echo "$root_password") | passwd root >/dev/null
 fi
 
-# # 修改默认LAN口IP
-# if [ -n "$lan_ip_address" ]; then
-#     uci set network.lan.ipaddr="$lan_ip_address/24"
-# fi
+# 修改默认LAN口IP
+if [ -n "$lan_ip_address" ]; then
+    uci set network.lan.ipaddr="$lan_ip_address/24"
+fi
 
 # 修改系统时区为东八区（上海）
 uci set system.@system[0].timezone='CST-8'
