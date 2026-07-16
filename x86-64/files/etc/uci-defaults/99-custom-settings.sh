@@ -40,4 +40,4 @@ uci set luci.main.mediaurlbase='/luci-static/argon'
 # 提交所有更改
 uci commit
 
-exit 0
+echo "自定义设置完成"
