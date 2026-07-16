@@ -25,23 +25,29 @@ append_feed() {
         return
     fi
 
-    sed -i "$a $feed_line" feeds.conf.default
+    sed -i "\$a $feed_line" feeds.conf.default
     echo "[新增] $feed_line"
 }
 
 # 更新&安装插件
 update_install_feeds() {
-    ./scripts/feeds update -a 1>/dev/null 2>&1
-    ./scripts/feeds install -a 1>/dev/null 2>&1
+    echo "更新feeds..."
+    ./scripts/feeds update -a
+
+    echo "删除冲突的插件..."
+    rm -rf feeds/smpackage/{base-files,dnsmasq,firewall*,fullconenat,libnftnl,nftables,ppp,opkg,ucl,upx,vsftpd*,miniupnpd-iptables,wireless-regdb}
+
+    echo "删除报错的插件..."
+    rm -rf feeds/smpackage/{webd}
+    
+    echo "安装feeds..."
+    ./scripts/feeds install -a
 }
 
 # 主函数
 main() {
     # 添加自定义Feeds
-    insert_feed "src-git small https://github.com/kenzok8/small;main"
-
-    # 删除冲突的插件
-    rm -rf feeds/smpackage/{base-files,dnsmasq,firewall*,fullconenat,libnftnl,nftables,ppp,opkg,ucl,upx,vsftpd*,miniupnpd-iptables,wireless-regdb}
+    append_feed "src-git smpackage https://github.com/kenzok8/small-package;main"
 
     # 更新&安装插件
     update_install_feeds
