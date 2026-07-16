@@ -14,16 +14,37 @@ on:
         description: "选择要编译的分支"
         required: true
         default: "openwrt-25.12"
+        type: string
+
+      part_size:
+        description: "设置rootfs大小"
+        required: false
+        default: 1024
+        type: number
 
       ip_address:
         description: "设置默认IP地址"
         required: false
         default: "192.168.10.1"
+        type: string
 
-      part_size:
-        description: "设置rootfs大小"
+      root_password:
+        description: "设置默认root密码"
         required: false
-        default: "1024"
+        default: "password"
+        type: string
+
+      pppoe_username:
+        description: "设置默认PPPoE用户名"
+        required: false
+        default: ""
+        type: string
+
+      pppoe_password:
+        description: "设置默认PPPoE密码"
+        required: false
+        default: ""
+        type: string
 
       upload_artifact:
         description: "上传固件到Artifact"
@@ -38,6 +59,8 @@ on:
         type: boolean
 
 env:
+  OPENWRT_DIR: openwrt
+  UPLOAD_DIR: upload
   CONFIG_FILE: default.config
   TZ: Asia/Shanghai
 
@@ -53,10 +76,9 @@ jobs:
       OPENWRT_BRANCH: ${{inputs.repo_branch}}
       PART_SIZE: ${{inputs.part_size}}
       IP_ADDRESS: ${{inputs.ip_address}}
-      PASSWORD: password
-      OPENWRT_DIR: openwrt
-      UPLOAD_DIR: upload
-      CONFIG_FILE: default.config
+      ROOT_PASSWORD: ${{inputs.root_password}}
+      PPPPOE_USERNAME: ${{inputs.pppoe_username}}
+      PPPPOE_PASSWORD: ${{inputs.pppoe_password}}
       UPLOAD_ARTIFACT: ${{inputs.upload_artifact}}
       UPLOAD_RELEASE: ${{inputs.upload_release}}
 
@@ -106,7 +128,7 @@ jobs:
         run: |
           cd ${{env.OPENWRT_DIR}}
           [ -e "$CONFIG_FILE" ] && cp -f "$CONFIG_FILE" .config
-          make defconfig
+          make defconfig 1>/dev/null 2>&1
 
       - name: 设置环境变量
         run: |

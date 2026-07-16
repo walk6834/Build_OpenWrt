@@ -11,8 +11,14 @@ if [ -n "${PART_SIZE:-}" ]; then
 fi
 
 # 根据环境变量替换默认密码
-if [ -n "${PASSWORD:-}" ]; then
+if [ -n "${ROOT_PASSWORD:-}" ]; then
     sed -i "s|^root_password=.*|root_password=\"${PASSWORD}\"|" "$CUSTOM_SETTINGS"
+fi
+
+# 根据环境变量替换PPPoE账号密码（两者均存在时才替换）
+if [ -n "${PPPPOE_USERNAME:-}" ] && [ -n "${PPPPOE_PASSWORD:-}" ]; then
+    sed -i "s|^pppoe_username=.*|pppoe_username=\"${PPPPOE_USERNAME}\"|" "$CUSTOM_SETTINGS"
+    sed -i "s|^pppoe_password=.*|pppoe_password=\"${PPPPOE_PASSWORD}\"|" "$CUSTOM_SETTINGS"
 fi
 
 # 方案一
@@ -32,8 +38,6 @@ BG_SRC="$GITHUB_WORKSPACE/images/bg1.jpg"
 BG_DST="feeds/luci/themes/luci-theme-argon/htdocs/luci-static/argon/img/bg1.jpg"
 if [ -f "$BG_SRC" ]; then
     cp -f "$BG_SRC" "$BG_DST" && echo "已替换 Argon 主题背景" || echo "Argon 主题背景替换失败"
-else
-    echo "未找到 Argon 主题背景文件，跳过"
 fi
 
 # ttyd免登录
