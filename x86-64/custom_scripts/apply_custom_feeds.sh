@@ -14,9 +14,22 @@ add_feed() {
     echo "[新增] $feed_line"
 }
 
-# 添加自定义Feeds
-add_feed "src-git nikki https://github.com/nikkinikki-org/OpenWrt-nikki;main"
-add_feed "src-git momo https://github.com/nikkinikki-org/OpenWrt-momo;main"
-
 # 更新&安装插件
-./scripts/feeds update -a && ./scripts/feeds install -a
+update_install_feeds() {
+    ./scripts/feeds update -a 1>/dev/null 2>&1
+    ./scripts/feeds install -a 1>/dev/null 2>&1
+}
+
+# 主函数
+main() {
+    # 添加自定义Feeds
+    add_feed "src-git nikki https://github.com/nikkinikki-org/OpenWrt-nikki;main"
+    add_feed "src-git momo https://github.com/nikkinikki-org/OpenWrt-momo;main"
+
+    # 更新&安装插件
+    update_install_feeds
+}
+
+# 调用主函数
+main "$@"
+
