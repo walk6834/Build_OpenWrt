@@ -151,10 +151,10 @@ jobs:
         if: steps.compile.outputs.status == 'success' && !cancelled() && env.UPLOAD_RELEASE == 'true'
         uses: softprops/action-gh-release@v3.0.2
         with:
-          name: ${{env.OPENWRT_BRANCH}}-${{env.COMPILE_DATE}}
+          tag_name: ${{env.OPENWRT_BRANCH}}-${{env.COMPILE_DATE}}
           token: ${{secrets.GITHUB_TOKEN}}
           files: |
-            ${{ github.workspace }}/${{env.UPLOAD_DIR}}/*
+            ${{env.UPLOAD_DIR}}/*
           body: |
             ## 📒 固件信息
             - ⚽ 固件源码: https://github.com/${{env.OPENWRT_REPO}}
