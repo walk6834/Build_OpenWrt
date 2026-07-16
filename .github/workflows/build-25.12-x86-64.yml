@@ -13,7 +13,7 @@ on:
       repo_branch:
         description: "选择要编译的分支"
         required: true
-        default: "openwrt-25.12"
+        default: "v25.12.1"
         type: string
 
       part_size:

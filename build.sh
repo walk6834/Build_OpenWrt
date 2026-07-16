@@ -1,7 +1,7 @@
 #!/bin/sh
 
 OPENWRT_REPO=immortalwrt/immortalwrt
-OPENWRT_BRANCH=openwrt-25.12
+OPENWRT_BRANCH=v25.12.1
 OPENWRT_DIR=openwrt
 TARGET_ARCH=x86-64
 
