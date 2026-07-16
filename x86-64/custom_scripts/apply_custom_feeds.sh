@@ -23,8 +23,7 @@ update_install_feeds() {
 # 主函数
 main() {
     # 添加自定义Feeds
-    add_feed "src-git nikki https://github.com/nikkinikki-org/OpenWrt-nikki;main"
-    add_feed "src-git momo https://github.com/nikkinikki-org/OpenWrt-momo;main"
+    add_feed "src-git small https://github.com/kenzok8/small;main"
 
     # 更新&安装插件
     update_install_feeds
