@@ -9,6 +9,10 @@ root_password="password"
 # LAN 的 IPv4 地址
 lan_ip_address=""
 
+# PPPoE 用户名和密码
+pppoe_username=""
+pppoe_password=""
+
 # 修改root 密码
 if [ -n "$root_password" ]; then
     (echo "$root_password"; sleep 1; echo "$root_password") | passwd root >/dev/null
@@ -17,6 +21,13 @@ fi
 # 修改默认LAN口IP
 if [ -n "$lan_ip_address" ]; then
     uci set network.lan.ipaddr="$lan_ip_address/24"
+fi
+
+if [ -n "$pppoe_username" ] && [ -n "$pppoe_password" ]; then
+    uci set network.wan.proto=pppoe
+    uci set network.wan.username="$pppoe_username"
+    uci set network.wan.password="$pppoe_password"
+    uci commit network
 fi
 
 # 修改系统时区为东八区（上海）
