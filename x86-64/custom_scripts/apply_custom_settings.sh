@@ -1,11 +1,13 @@
 #!/bin/sh
 
+CONFIG_FILE=".config"
 CUSTOM_SETTINGS="files/etc/uci-defaults/99-custom-settings.sh"
+CONFIG_GENERATE="package/base-files/files/bin/config_generate"
 
 # 设置固件rootfs大小
 if [ -n "${PART_SIZE:-}" ]; then
-    sed -i '/ROOTFS_PARTSIZE/d' .config
-    echo "CONFIG_TARGET_ROOTFS_PARTSIZE=$PART_SIZE" >> .config
+    sed -i '/ROOTFS_PARTSIZE/d' "$CONFIG_FILE"
+    echo "CONFIG_TARGET_ROOTFS_PARTSIZE=$PART_SIZE" >> "$CONFIG_FILE"
 fi
 
 # 根据环境变量替换默认密码
@@ -13,10 +15,17 @@ if [ -n "${PASSWORD:-}" ]; then
     sed -i "s|^root_password=.*|root_password=\"${PASSWORD}\"|" "$CUSTOM_SETTINGS"
 fi
 
+# 方案一
 # 根据环境变量替换默认LAN IP地址
 if [ -n "${IP_ADDRESS:-}" ]; then
-    sed -i "s|^lan_ip_address=.*|lan_ip_address=\"${IP_ADDRESS}\"|" "$CUSTOM_SETTINGS"
+    sed -i '/lan) ipad/s/".*"/"'"$IP_ADDRESS"'"/' "$CONFIG_GENERATE"
 fi
+
+# 方案二
+# 根据环境变量替换默认LAN IP地址
+# if [ -n "${IP_ADDRESS:-}" ]; then
+#     sed -i "s|^lan_ip_address=.*|lan_ip_address=\"${IP_ADDRESS}\"|" "$CUSTOM_SETTINGS"
+# fi
 
 # 更改argon主题背景
 BG_SRC="$GITHUB_WORKSPACE/images/bg1.jpg"
@@ -26,3 +35,6 @@ if [ -f "$BG_SRC" ]; then
 else
     echo "未找到 Argon 主题背景文件，跳过"
 fi
+
+# ttyd免登录
+sed -i 's|/bin/login|/bin/login -f root|g' feeds/packages/utils/ttyd/files/ttyd.config
