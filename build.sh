@@ -42,3 +42,5 @@ echo $(date "+%Y-%m-%d %H:%M:%S end") >> build.txt
 
 echo "开始上传..."
 ./custom_scripts/collect_upload.sh
+
+echo "全部完成"
