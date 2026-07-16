@@ -1,4 +1,4 @@
-name: OpenWrt 25.12 Builder
+name: Build OpenWrt 25.12
 
 on:
   workflow_dispatch:
@@ -45,7 +45,7 @@ permissions:
   contents: write
 
 jobs:
-  OpenWrt_Builder:
+  Build_OpenWrt:
     runs-on: ubuntu-latest
 
     env:
@@ -164,11 +164,12 @@ jobs:
             - 💝 源码分支: ${{env.OPENWRT_BRANCH}}
             - 🚀 内核版本: ${{env.KERNEL_VERSION}}
             - 🌐 默认地址: ${{env.IP_ADDRESS}}
-            - 🔑 默认密码: password
+            - 🔑 默认密码: ${{env.PASSWORD}}
 
   Delete_Workflow:
-    needs: [OpenWrt_Builder]
+    needs: [Build_OpenWrt]
     runs-on: ubuntu-latest
+
     steps:
       - name: 删除旧的工作流运行记录
         uses: Mattraks/delete-workflow-runs@v2
