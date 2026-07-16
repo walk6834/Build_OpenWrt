@@ -25,7 +25,12 @@ cd $OPENWRT_DIR
 echo "更新feeds并安装..."
 ./custom_scripts/apply_custom_feeds.sh
 
-echo "生辰默认配置..."
+# echo "生成配置文件..."
+# make menuconfig
+# ./scripts/diffconfig.sh > default.config
+# cp default.config ../
+
+echo "应用配置文件..."
 cp -f default.config .config
 make defconfig
 
