@@ -26,7 +26,7 @@ echo "更新feeds并安装..."
 ./custom_scripts/apply_custom_feeds.sh
 
 echo "生辰默认配置..."
-cp default.config .config
+cp -f default.config .config
 make defconfig
 
 echo "应用自定义设置..."
