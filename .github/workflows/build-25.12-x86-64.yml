@@ -66,6 +66,7 @@ env:
 
 permissions:
   contents: write
+  actions: write
 
 jobs:
   Build_OpenWrt:
