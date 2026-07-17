@@ -171,6 +171,7 @@ jobs:
       - name: 组织编译后的固件
         if: steps.compile.outputs.status == 'success' && !cancelled()
         run: |
+          echo "NAME_SUFFIX=${{matrix.config_name}}" >> $GITHUB_ENV
           cd ${{env.OPENWRT_DIR}} && ./custom_scripts/collect_upload.sh
 
       - name: 上传固件到Artifacts
