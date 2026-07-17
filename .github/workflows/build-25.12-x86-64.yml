@@ -83,111 +83,23 @@ jobs:
       UPLOAD_ARTIFACT: ${{inputs.upload_artifact}}
       UPLOAD_RELEASE: ${{inputs.upload_release}}
 
+    strategy:
+      fail-fast: false
+      matrix:
+        config_name:
+          - minimal
+          - standard
+          - full
+
     steps:
       - name: 克隆仓库
         uses: actions/checkout@main
 
-      - name: 当前环境信息
+      - name: 测试
         run: |
-          chmod +x scripts/check.sh && ./scripts/check.sh
-
-      - name: 清理磁盘空间
-        uses: jlumbroso/free-disk-space@main
-        with:
-          tool-cache: false
-          android: true
-          dotnet: true
-          haskell: true
-          large-packages: true
-          docker-images: true
-          swap-storage: true
-
-      - name: 清理后硬盘空间使用情况
-        run: |
-          echo "清理后硬盘空间使用情况:"
-          df -hT
-
-      - name: 初始化环境
-        run: |
-          chmod +x scripts/init-env.sh && ./scripts/init-env.sh
-
-      - name: 克隆OpenWrt源码
-        run: |
-          git clone -b ${{env.OPENWRT_BRANCH}} --single-branch --depth 1 https://github.com/${{env.OPENWRT_REPO}}.git ${{env.OPENWRT_DIR}}
-
-      - name: 复制自定义文件
-        run: |
-          cp -rf $GITHUB_WORKSPACE/x86-64/* ${{env.OPENWRT_DIR}}/
-          chmod +x ${{env.OPENWRT_DIR}}/files/etc/uci-defaults/*.sh
-          chmod +x ${{env.OPENWRT_DIR}}/custom_scripts/*.sh
-
-      - name: 更新&安装插件
-        run: |
-          cd ${{env.OPENWRT_DIR}} && ./custom_scripts/apply_custom_feeds.sh
-
-      - name: 生成配置文件
-        run: |
-          cd ${{env.OPENWRT_DIR}}
-          [ -e "$CONFIG_FILE" ] && cp -f "$CONFIG_FILE" .config
-          make defconfig 1>/dev/null 2>&1
-
-      - name: 设置环境变量
-        run: |
-          cd ${{env.OPENWRT_DIR}} && ./custom_scripts/set_variable_values.sh
-
-      - name: 应用自定义设置
-        run: |
-          cd ${{env.OPENWRT_DIR}} && ./custom_scripts/apply_custom_settings.sh
-
-      - name: 下载依赖包
-        id: download
-        run: |
-          cd ${{env.OPENWRT_DIR}}
-          make download -j $(($(nproc)+1)) V=s || make download -j1 V=s
-
-      - name: 编译固件
-        id: compile
-        run: |
-          cd ${{env.OPENWRT_DIR}}
-          echo -e "$(($(nproc) + 1)) thread compile"
-          make -j $(($(nproc)+1)) V=s || make -j1 V=s
-          echo "status=success" >> $GITHUB_OUTPUT
-          echo "COMPILE_DATE=$(date +"%Y%m%d")" >> $GITHUB_ENV
-          echo "COMPILE_TIME=$(date +"%Y%m%d%H%M")" >> $GITHUB_ENV
-
-      - name: 编译后硬盘空间使用情况
-        run: |
-          echo "编译后硬盘空间使用情况:"
-          df -hT
-
-      - name: 组织编译后的固件
-        if: steps.compile.outputs.status == 'success' && !cancelled()
-        run: |
-          cd ${{env.OPENWRT_DIR}} && ./custom_scripts/collect_upload.sh
-
-      - name: 上传固件到Artifacts
-        if: steps.compile.outputs.status == 'success' && !cancelled() && env.UPLOAD_ARTIFACT == 'true'
-        uses: actions/upload-artifact@main
-        with:
-          name: ${{env.OPENWRT_BRANCH}}-${{env.COMPILE_DATE}}
-          path: ${{env.UPLOAD_DIR}}/
-          overwrite: true
-
-      - name: 上传固件到Releases
-        if: steps.compile.outputs.status == 'success' && !cancelled() && env.UPLOAD_RELEASE == 'true'
-        uses: softprops/action-gh-release@v3.0.2
-        with:
-          tag_name: ${{env.OPENWRT_BRANCH}}-${{env.COMPILE_DATE}}
-          token: ${{secrets.GITHUB_TOKEN}}
-          files: |
-            ${{env.UPLOAD_DIR}}/*
-          body: |
-            ## 📒 固件信息
-            - ⚽ 固件源码: https://github.com/${{env.OPENWRT_REPO}}
-            - 💝 源码分支: ${{env.OPENWRT_BRANCH}}
-            - 🚀 内核版本: ${{env.KERNEL_VERSION}}
-            - 🌐 默认地址: ${{env.IP_ADDRESS}}
-            - 🔑 默认密码: ${{env.PASSWORD}}
+          CONFIG_FILE="x86-64/${{matrix.config_name}}.config"
+          [ -e "${CONFIG_FILE}" ] && cp -f "${CONFIG_FILE}" .config
+          ll -a .config
 
   Delete_Workflow:
     needs: [Build_OpenWrt]
