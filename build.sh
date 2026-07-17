@@ -27,11 +27,11 @@ echo "更新feeds并安装..."
 
 # echo "生成配置文件..."
 # make menuconfig
-# ./scripts/diffconfig.sh > default.config
-# cp default.config ../
+# ./scripts/diffconfig.sh > standard.config
+# cp standard.config ../
 
 echo "应用配置文件..."
-cp -f default.config .config
+cp -f standard.config .config
 make defconfig
 
 echo "应用自定义设置..."
