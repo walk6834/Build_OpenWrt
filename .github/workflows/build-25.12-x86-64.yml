@@ -188,6 +188,7 @@ jobs:
         with:
           tag_name: ${{env.OPENWRT_BRANCH}}-${{env.COMPILE_DATE}}
           token: ${{secrets.GITHUB_TOKEN}}
+          make_latest: true
           files: |
             ${{env.UPLOAD_DIR}}/*
           body: |
