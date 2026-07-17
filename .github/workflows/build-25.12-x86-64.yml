@@ -99,7 +99,7 @@ jobs:
         run: |
           CONFIG_FILE="x86-64/${{matrix.config_name}}.config"
           [ -e "${CONFIG_FILE}" ] && cp -f "${CONFIG_FILE}" .config
-          ll -a .config
+          ls -la .config
 
   Delete_Workflow:
     needs: [Build_OpenWrt]
