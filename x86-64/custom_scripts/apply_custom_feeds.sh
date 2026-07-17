@@ -35,10 +35,12 @@ update_install_feeds() {
     ./scripts/feeds update -a
 
     echo "删除冲突的插件..."
-    rm -rf feeds/smpackage/{base-files,dnsmasq,firewall*,fullconenat,libnftnl,nftables,ppp,opkg,ucl,upx,vsftpd*,miniupnpd-iptables,wireless-regdb}
+    rm -rf feeds/luci/applications/luci-app-mosdns
+    rm -rf feeds/packages/net/{alist,adguardhome,mosdns,xray*,v2ray*,sing*,smartdns} feeds/packages/utils/v2dat feeds/packages/lang/golang
 
-    echo "删除报错的插件..."
-    rm -rf feeds/smpackage/{webd}
+    echo "安装golang..."
+    rm -rf feeds/packages/lang/golang
+    git clone https://github.com/kenzok8/golang -b 1.26 feeds/packages/lang/golang
     
     echo "安装feeds..."
     ./scripts/feeds install -a
@@ -47,7 +49,8 @@ update_install_feeds() {
 # 主函数
 main() {
     # 添加自定义Feeds
-    append_feed "src-git smpackage https://github.com/kenzok8/small-package;main"
+    insert_feed "src-git kenzo https://github.com/kenzok8/openwrt-packages" 1
+    insert_feed "src-git small https://github.com/kenzok8/small" 2
 
     # 更新&安装插件
     update_install_feeds
