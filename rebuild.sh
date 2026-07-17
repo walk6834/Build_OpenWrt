@@ -18,9 +18,6 @@ make clean                    # 清理编译产物
 # make distclean                # 完全清理（需重新配置）
 rm -rf $UPLOAD_DIR/
 
-echo "切换到OpenWrt目录..."
-cd $OPENWRT_DIR
-
 echo "更新feeds并安装..."
 ./custom_scripts/apply_custom_feeds.sh
 
