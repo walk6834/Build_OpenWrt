@@ -61,7 +61,6 @@ on:
 env:
   OPENWRT_DIR: openwrt
   UPLOAD_DIR: upload
-  CONFIG_FILE: default.config
   TZ: Asia/Shanghai
 
 permissions:
@@ -82,6 +81,14 @@ jobs:
       PPPPOE_PASSWORD: ${{inputs.pppoe_password}}
       UPLOAD_ARTIFACT: ${{inputs.upload_artifact}}
       UPLOAD_RELEASE: ${{inputs.upload_release}}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        config_name:
+          # - minimal
+          - standard
+          - full
 
     steps:
       - name: 克隆仓库
@@ -127,6 +134,7 @@ jobs:
 
       - name: 生成配置文件
         run: |
+          CONFIG_FILE="${{matrix.config_name}}.config"
           cd ${{env.OPENWRT_DIR}}
           [ -e "$CONFIG_FILE" ] && cp -f "$CONFIG_FILE" .config
           make defconfig 1>/dev/null 2>&1
