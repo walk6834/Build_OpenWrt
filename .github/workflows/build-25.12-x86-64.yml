@@ -102,6 +102,7 @@ jobs:
           ./x86-64/custom_scripts/collect_upload.sh
 
           echo "GITHUB_ENV:${{env.NAME_SUFFIX}}"
+          echo "GITHUB_ENV:${{GITHUB_ENV}}"
 
   Delete_Workflow:
     needs: [Build_OpenWrt]
