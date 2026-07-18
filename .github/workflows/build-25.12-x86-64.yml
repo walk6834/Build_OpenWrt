@@ -97,9 +97,8 @@ jobs:
 
       - name: 测试
         run: |
-          CONFIG_FILE="x86-64/${{matrix.config_name}}.config"
-          [ -e "${CONFIG_FILE}" ] && cp -f "${CONFIG_FILE}" .config
-          ls -la .config
+          echo "NAME_SUFFIX=${{matrix.config_name}}" >> $GITHUB_ENV
+          cd ${{env.OPENWRT_DIR}} && ./custom_scripts/collect_upload.sh
 
   Delete_Workflow:
     needs: [Build_OpenWrt]
