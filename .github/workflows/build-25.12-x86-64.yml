@@ -98,7 +98,7 @@ jobs:
       - name: 测试
         run: |
           echo "NAME_SUFFIX=${{matrix.config_name}}" >> $GITHUB_ENV
-          cd ${{env.OPENWRT_DIR}} && ./custom_scripts/collect_upload.sh
+          ./x86-64/custom_scripts/collect_upload.sh
 
   Delete_Workflow:
     needs: [Build_OpenWrt]
