@@ -11,6 +11,7 @@ export UPLOAD_DIR=uploads
 
 echo "切换到OpenWrt目录..."
 cd $OPENWRT_DIR
+chmod +x ./custom_scripts/*.sh
 
 echo "清理旧构建..."
 make clean                    # 清理编译产物
@@ -21,9 +22,9 @@ rm -rf $UPLOAD_DIR/
 echo "更新feeds并安装..."
 ./custom_scripts/apply_custom_feeds.sh
 
-echo "生辰默认配置..."
-cp -f default.config .config
-make defconfig
+echo "生成配置文件..."
+make menuconfig
+./scripts/diffconfig.sh > default.config
 
 echo "应用自定义设置..."
 ./custom_scripts/apply_custom_settings.sh
@@ -37,6 +38,7 @@ make -j $(($(nproc)+1)) V=s || make -j1 V=s
 echo $(date "+%Y-%m-%d %H:%M:%S end") >> build.txt
 
 echo "开始上传..."
+export NAME_SUFFIX=walk6834
 ./custom_scripts/collect_upload.sh
 
 echo "全部完成"

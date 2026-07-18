@@ -21,18 +21,18 @@ chmod +x $OPENWRT_DIR/custom_scripts/*.sh
 
 echo "切换到OpenWrt目录..."
 cd $OPENWRT_DIR
+chmod +x ./custom_scripts/*.sh
 
 echo "更新feeds并安装..."
 ./custom_scripts/apply_custom_feeds.sh
 
-# echo "生成配置文件..."
-# make menuconfig
-# ./scripts/diffconfig.sh > standard.config
-# cp standard.config ../
+echo "生成配置文件..."
+make menuconfig
+./scripts/diffconfig.sh > default.config
 
-echo "应用配置文件..."
-cp -f standard.config .config
-make defconfig
+# echo "应用配置文件..."
+# cp -f standard.config .config
+# make defconfig
 
 echo "应用自定义设置..."
 ./custom_scripts/apply_custom_settings.sh
