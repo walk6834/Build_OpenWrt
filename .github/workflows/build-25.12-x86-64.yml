@@ -87,7 +87,7 @@ jobs:
       matrix:
         config_name:
           # - minimal
-          - standard
+          # - standard
           - full
 
     steps:
