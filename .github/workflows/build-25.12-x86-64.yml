@@ -134,7 +134,7 @@ jobs:
 
       - name: 生成配置文件
         run: |
-          CONFIG_FILE="${{matrix.config_name}}.config"
+          CONFIG_FILE="custom_config/${{matrix.config_name}}.config"
           cd ${{env.OPENWRT_DIR}}
           [ -e "$CONFIG_FILE" ] && cp -f "$CONFIG_FILE" .config
           make defconfig 1>/dev/null 2>&1
