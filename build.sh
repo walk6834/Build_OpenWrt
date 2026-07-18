@@ -21,7 +21,6 @@ chmod +x $OPENWRT_DIR/custom_scripts/*.sh
 
 echo "切换到OpenWrt目录..."
 cd $OPENWRT_DIR
-chmod +x ./custom_scripts/*.sh
 
 echo "更新feeds并安装..."
 ./custom_scripts/apply_custom_feeds.sh
