@@ -11,6 +11,7 @@ export UPLOAD_DIR=uploads
 
 echo "切换到OpenWrt目录..."
 cd $OPENWRT_DIR
+mkdir -p logs
 
 echo "清理旧构建..."
 make clean                    # 清理编译产物
@@ -29,11 +30,11 @@ echo "应用自定义设置..."
 ./custom_scripts/apply_custom_settings.sh
 
 echo "开始下载依赖..."
-make download -j $(($(nproc)+1)) V=s
+(make download -j $(($(nproc)+1)) V=s || make download -j1 V=s) 1> logs/download.txt 2>&1
 
 echo "开始编译OpenWrt..."
 echo $(date "+%Y-%m-%d %H:%M:%S start") > build.txt
-make -j $(($(nproc)+1)) V=s || make -j1 V=s
+(make -j $(($(nproc)+1)) V=s || make -j1 V=s) 1> logsopenwrt.txt 2>&1
 echo $(date "+%Y-%m-%d %H:%M:%S end") >> build.txt
 
 echo "开始上传..."
