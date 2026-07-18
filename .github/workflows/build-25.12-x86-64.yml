@@ -98,6 +98,9 @@ jobs:
       - name: 测试
         run: |
           echo "NAME_SUFFIX=${{matrix.config_name}}" >> $GITHUB_ENV
+
+      - name: 测试1
+        run: |
           chmod +x ./x86-64/custom_scripts/*.sh
           ./x86-64/custom_scripts/collect_upload.sh
 
