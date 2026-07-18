@@ -101,6 +101,8 @@ jobs:
           chmod +x ./x86-64/custom_scripts/*.sh
           ./x86-64/custom_scripts/collect_upload.sh
 
+          echo "GITHUB_ENV:${{env.NAME_SUFFIX}}"
+
   Delete_Workflow:
     needs: [Build_OpenWrt]
     runs-on: ubuntu-latest
