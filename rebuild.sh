@@ -11,7 +11,6 @@ export UPLOAD_DIR=uploads
 
 echo "切换到OpenWrt目录..."
 cd $OPENWRT_DIR
-chmod +x ./custom_scripts/*.sh
 
 echo "清理旧构建..."
 make clean                    # 清理编译产物
