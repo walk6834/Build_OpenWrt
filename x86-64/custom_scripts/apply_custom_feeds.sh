@@ -15,8 +15,59 @@ add_feed() {
     echo "[新增] $feed_line"
 }
 
+# # 更新&安装插件
+# update_install_feeds() {
+#     echo "更新feeds..."
+#     ./scripts/feeds update -a
+
+#     echo "删除冲突的插件..."
+#     rm -rf feeds/luci/applications/luci-app-mosdns
+#     rm -rf feeds/packages/net/{alist,adguardhome,mosdns,xray*,v2ray*,sing*,smartdns} feeds/packages/utils/v2dat feeds/packages/lang/golang
+
+#     echo "安装golang..."
+#     rm -rf feeds/packages/lang/golang
+#     git clone https://github.com/kenzok8/golang -b 1.26 feeds/packages/lang/golang
+    
+#     echo "安装feeds..."
+#     ./scripts/feeds install -a
+# }
+
+# # 主函数
+# main() {
+#     # 添加自定义Feeds
+#     add_feed "src-git kenzo https://github.com/kenzok8/openwrt-packages" '1i'
+#     add_feed "src-git small https://github.com/kenzok8/small" '2i'
+
+#     # 更新&安装插件
+#     update_install_feeds
+# }
+
+# 添加自定义Feeds
+add_custom_feeds() {
+    add_feed "src-git passwall_packages https://github.com/Openwrt-Passwall/openwrt-passwall-packages.git;main" '1i'
+    add_feed "src-git passwall_luci https://github.com/Openwrt-Passwall/openwrt-passwall.git;main" '2i'
+    add_feed "src-git nikki https://github.com/nikkinikki-org/OpenWrt-nikki.git;main"
+    add_feed "src-git momo https://github.com/nikkinikki-org/OpenWrt-momo.git;main"
+}
+
 # 更新&安装插件
 update_install_feeds() {
+    echo "更新feeds..."
+    ./scripts/feeds update -a
+
+    echo "安装feeds..."
+    ./scripts/feeds install -a
+}
+
+# 添加自定义Feeds
+add_custom_feeds1() {
+    # 添加自定义Feeds
+    add_feed "src-git kenzo https://github.com/kenzok8/openwrt-packages" '1i'
+    add_feed "src-git small https://github.com/kenzok8/small" '2i'
+}
+
+# 更新&安装插件
+update_install_feeds1() {
     echo "更新feeds..."
     ./scripts/feeds update -a
 
@@ -35,8 +86,7 @@ update_install_feeds() {
 # 主函数
 main() {
     # 添加自定义Feeds
-    add_feed "src-git kenzo https://github.com/kenzok8/openwrt-packages" '1i'
-    add_feed "src-git small https://github.com/kenzok8/small" '2i'
+    add_custom_feeds
 
     # 更新&安装插件
     update_install_feeds
