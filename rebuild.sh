@@ -1,9 +1,9 @@
 #!/bin/sh
 
-OPENWRT_REPO=immortalwrt/immortalwrt
-OPENWRT_BRANCH=v25.12.1
-OPENWRT_DIR=openwrt
-TARGET_ARCH=x86-64
+export OPENWRT_REPO=immortalwrt/immortalwrt
+export OPENWRT_BRANCH=v25.12.1
+export OPENWRT_DIR=openwrt
+export TARGET_ARCH=x86-64
 
 export PART_SIZE=1024
 export GITHUB_WORKSPACE=$(pwd)

@@ -1,9 +1,9 @@
 #!/bin/sh
 
-OPENWRT_REPO=immortalwrt/immortalwrt
-OPENWRT_BRANCH=v25.12.1
-OPENWRT_DIR=openwrt
-TARGET_ARCH=x86-64
+export OPENWRT_REPO=immortalwrt/immortalwrt
+export OPENWRT_BRANCH=v25.12.1
+export OPENWRT_DIR=openwrt
+export TARGET_ARCH=x86-64
 
 export PART_SIZE=1024
 export GITHUB_WORKSPACE=$(pwd)
@@ -46,6 +46,7 @@ make -j $(($(nproc)+1)) V=s || make -j1 V=s
 echo $(date "+%Y-%m-%d %H:%M:%S end") >> build.txt
 
 echo "开始上传..."
+export NAME_SUFFIX=walk6834
 ./custom_scripts/collect_upload.sh
 
 echo "全部完成"
