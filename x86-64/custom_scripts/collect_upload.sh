@@ -2,7 +2,7 @@
 # 功能：将 ./bin/targets/ 下所有匹配 *wrt*.img.gz 的文件移动至指定目录，
 #       并根据 NAME_SUFFIX 环境变量的值决定是否重命名（非空时添加后缀）。
 
-set -e  # 遇错即停，便于及早发现问题
+set -e # 遇错即停，便于及早发现问题
 
 # 1. 校验关键环境变量
 : "${GITHUB_WORKSPACE:?错误：环境变量 GITHUB_WORKSPACE 未设置}"
@@ -17,16 +17,16 @@ mkdir -p "$dest_dir"
 
 # 4. 检查源目录是否存在
 if [ ! -d "$src_dir" ]; then
-    echo "警告：源目录 $src_dir 不存在，无文件可处理。" >&2
-    exit 0
+	echo "警告：源目录 $src_dir 不存在，无文件可处理。" >&2
+	exit 0
 fi
 
 # 5. 根据 NAME_SUFFIX 执行不同逻辑
 if [ -n "$NAME_SUFFIX" ]; then
-    echo "NAME_SUFFIX 非空，将重命名文件并移动至 $dest_dir"
+	echo "NAME_SUFFIX 非空，将重命名文件并移动至 $dest_dir"
 
-    # 使用 find + sh -c 批量处理，传入目标目录和后缀作为参数
-    find "$src_dir" -type f -name "*wrt*.img.gz" -exec sh -c '
+	# 使用 find + sh -c 批量处理，传入目标目录和后缀作为参数
+	find "$src_dir" -type f -name "*wrt*.img.gz" -exec sh -c '
         dest="$1"
         suffix="$2"
         shift 2
@@ -39,8 +39,8 @@ if [ -n "$NAME_SUFFIX" ]; then
         done
     ' sh "$dest_dir" "$NAME_SUFFIX" {} +
 else
-    echo "NAME_SUFFIX 为空，直接移动文件至 $dest_dir"
+	echo "NAME_SUFFIX 为空，直接移动文件至 $dest_dir"
 
-    # 使用 -exec ... + 批量移动，高效且避免命令行长度限制
-    find "$src_dir" -type f -name "*wrt*.img.gz" -exec mv -f {} "$dest_dir/" +
+	# 使用 -exec ... + 批量移动，高效且避免命令行长度限制
+	find "$src_dir" -type f -name "*wrt*.img.gz" -exec mv -f {} "$dest_dir/" +
 fi
