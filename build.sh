@@ -28,7 +28,7 @@ echo "更新feeds并安装..."
 
 echo "生成配置文件..."
 make menuconfig
-./scripts/diffconfig.sh > default.config
+./scripts/diffconfig.sh >default.config
 
 # echo "应用配置文件..."
 # cp -f standard.config .config
@@ -36,14 +36,15 @@ make menuconfig
 
 echo "应用自定义设置..."
 ./custom_scripts/apply_custom_settings.sh
+./custom_scripts/patch_custom_settings.sh
 
 echo "开始下载依赖..."
-(make download -j $(($(nproc)+1)) V=s || make download -j1 V=s) 1> logs/download.txt 2>&1
+(make download -j $(($(nproc) + 1)) V=s || make download -j1 V=s) 1>logs/download.txt 2>&1
 
 echo "开始编译OpenWrt..."
-echo $(date "+%Y-%m-%d %H:%M:%S start") > build.txt
-(make -j $(($(nproc)+1)) V=s || make -j1 V=s) 1> logs/openwrt.txt 2>&1
-echo $(date "+%Y-%m-%d %H:%M:%S end") >> build.txt
+echo $(date "+%Y-%m-%d %H:%M:%S start") >build.txt
+(make -j $(($(nproc) + 1)) V=s || make -j1 V=s) 1>logs/openwrt.txt 2>&1
+echo $(date "+%Y-%m-%d %H:%M:%S end") >>build.txt
 
 echo "开始上传..."
 export NAME_SUFFIX=walk6834

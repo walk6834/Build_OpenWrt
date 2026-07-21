@@ -146,7 +146,9 @@ jobs:
 
       - name: 应用自定义设置
         run: |
-          cd ${{env.OPENWRT_DIR}} && ./custom_scripts/apply_custom_settings.sh
+          cd ${{env.OPENWRT_DIR}}
+          ./custom_scripts/apply_custom_settings.sh
+          ./custom_scripts/patch_custom_settings.sh
 
       - name: 下载依赖包
         id: download
