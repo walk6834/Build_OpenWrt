@@ -34,6 +34,32 @@ install_feeds() {
 	./scripts/feeds install -a
 }
 
+# 克隆Git仓库到指定目录
+# 参数1: 仓库URL（必选） 参数2: 分支名（可选） 参数3: 目标目录（必选）
+clone_repo() {
+	repo_url="$1"
+	branch="$2"
+	target_dir="$3"
+
+	if [ -z "$repo_url" ] || [ -z "$target_dir" ]; then
+		echo "[错误] 缺少必要参数: clone_repo <仓库URL> [分支] <目标目录>"
+		return 1
+	fi
+
+	if [ -n "$branch" ]; then
+		git clone --depth 1 -b "$branch" "$repo_url" "$target_dir" 2>/dev/null
+	else
+		git clone --depth 1 "$repo_url" "$target_dir" 2>/dev/null
+	fi
+
+	if [ $? -eq 0 ]; then
+		echo "[成功] 已克隆: $repo_url -> $target_dir"
+	else
+		echo "[错误] 克隆失败: $repo_url"
+		return 1
+	fi
+}
+
 # 克隆自定义插件
 clone_packages() {
 	echo "克隆自定义插件..."
