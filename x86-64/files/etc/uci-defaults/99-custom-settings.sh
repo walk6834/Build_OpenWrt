@@ -25,6 +25,7 @@ fi
 # 修改默认LAN口IP
 if [ -n "$lan_ip_address" ]; then
 	uci set network.lan.ipaddr="$lan_ip_address/24"
+	uci commit network
 fi
 
 if [ -n "$pppoe_username" ] && [ -n "$pppoe_password" ]; then
@@ -37,11 +38,13 @@ fi
 # 修改系统时区为东八区（上海）
 uci set system.@system[0].timezone='CST-8'
 uci set system.@system[0].zonename='Asia/Shanghai'
+uci commit system
 
 # # 修改Web界面默认主题为 Argon
 # uci set luci.main.mediaurlbase='/luci-static/argon'
+# uci commit luci
 
 # 提交所有更改
-uci commit
+# uci commit
 
 echo "自定义设置完成"
