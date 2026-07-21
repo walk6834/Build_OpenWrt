@@ -15,27 +15,31 @@ pppoe_password=""
 
 # 修改root 密码
 if [ -n "$root_password" ]; then
-    (echo "$root_password"; sleep 1; echo "$root_password") | passwd root >/dev/null
+	(
+		echo "$root_password"
+		sleep 1
+		echo "$root_password"
+	) | passwd root >/dev/null
 fi
 
 # 修改默认LAN口IP
 if [ -n "$lan_ip_address" ]; then
-    uci set network.lan.ipaddr="$lan_ip_address/24"
+	uci set network.lan.ipaddr="$lan_ip_address/24"
 fi
 
 if [ -n "$pppoe_username" ] && [ -n "$pppoe_password" ]; then
-    uci set network.wan.proto=pppoe
-    uci set network.wan.username="$pppoe_username"
-    uci set network.wan.password="$pppoe_password"
-    uci commit network
+	uci set network.wan.proto=pppoe
+	uci set network.wan.username="$pppoe_username"
+	uci set network.wan.password="$pppoe_password"
+	uci commit network
 fi
 
 # 修改系统时区为东八区（上海）
 uci set system.@system[0].timezone='CST-8'
 uci set system.@system[0].zonename='Asia/Shanghai'
 
-# 修改Web界面默认主题为 Argon
-uci set luci.main.mediaurlbase='/luci-static/argon'
+# # 修改Web界面默认主题为 Argon
+# uci set luci.main.mediaurlbase='/luci-static/argon'
 
 # 提交所有更改
 uci commit
