@@ -15,39 +15,42 @@
 ## 快速开始(GitHub Actions)
 
 1. 进入仓库 **Actions** → 选择 **Build OpenWrt 25.12** → **Run workflow**
-2. 按需调整 6 个输入参数:
+2. 按需调整 9 个输入参数:
 
-| 名称              | 类型    | 必填 | 默认值                    | 说明                             |
-| ----------------- | ------- | ---- | ------------------------- | -------------------------------- |
-| `repo_name`       | choice  | ✅   | `immortalwrt/immortalwrt` | 上游源码仓库                     |
-| `repo_branch`     | string  | ✅   | `openwrt-25.12`           | 上游源码分支                     |
-| `ip_address`      | string  |      | `192.168.10.1`            | 默认 LAN 口 IP                   |
-| `pppoe_username`  | string  |      | ``                        | PPPoE 用户名                     |
-| `pppoe_password`  | string  |      | ``                        | PPPoE 密码                       |
-| `part_size`       | string  |      | 1024                      | rootfs 分区大小(MB)              |
-| `upload_artifact` | boolean |      | `true`                    | 是否上传 GitHub Actions Artifact |
-| `upload_release`  | boolean |      | `true`                    | 是否发布 GitHub Release          |
+| 名称              | 类型    | 必填 | 默认值                    | 说明                                   |
+| ----------------- | ------- | ---- | ------------------------- | -------------------------------------- |
+| `repo_name`       | choice  | ✅   | `immortalwrt/immortalwrt` | 上游源码仓库(当前只提供该选项)         |
+| `repo_branch`     | string  | ✅   | `v25.12.1`                | 上游源码分支                           |
+| `part_size`       | number  |      | 1024                      | rootfs 分区大小(MB)                    |
+| `ip_address`      | string  |      | `192.168.10.1`            | 默认 LAN 口 IP                         |
+| `root_password`   | string  |      | `password`                | 默认 root 密码(注入到 `ROOT_PASSWORD`) |
+| `pppoe_username`  | string  |      | ``                        | PPPoE 用户名(同时填写密码才生效)       |
+| `pppoe_password`  | string  |      | ``                        | PPPoE 密码                             |
+| `upload_artifact` | boolean |      | `true`                    | 是否上传 GitHub Actions Artifact       |
+| `upload_release`  | boolean |      | `true`                    | 是否发布 GitHub Release                |
+
+> **矩阵说明**:工作流 `strategy.matrix.config_name` 当前只启用 `standard`(`minimal` 与 `full` 已在 `.github/workflows/build-25.12-x86-64.yml` 中注释)。扩展配置请编辑工作流并对应在 `x86-64/custom_config/` 增加同名 `.config` 文件,产物会自动以 config 名为 `NAME_SUFFIX` 后缀(详见「产物获取」)。
 
 3. 等待 30–60 分钟,产物可通过以下两种方式获取:
-   - **Artifact**:文件名格式 `<branch>-<YYYYMMDD>`,如 `openwrt-25.12-20260717`
-   - **Release**:Tag 名称同 Artifact,Release 描述中展示源码、内核版本、默认 IP、默认密码
+   - **Artifact**:文件名 `<repo_branch>-<YYYYMMDD>`,例如 `v25.12.1-20260717`;Artifact 名 = `${{env.OPENWRT_BRANCH}}-${{env.COMPILE_DATE}}`
+   - **Release**:Tag 同名(`make_latest: true`),Release 描述自动写入源码仓库、分支、内核版本、默认 IP、默认密码(`KERNEL_VERSION` / `IP_ADDRESS` / `PASSWORD`,其中 `PASSWORD` 默认取自工作流变量 `ROOT_PASSWORD`)
 
 ---
 
 ## 默认固件参数
 
-| 项          | 默认值                                      |
-| ----------- | ------------------------------------------- |
-| 目标平台    | x86-64 generic                              |
-| 上游源码    | `immortalwrt/immortalwrt` @ `openwrt-25.12` |
-| Rootfs 分区 | 1024 MB                                     |
-| LAN IP      | `192.168.10.1`                              |
-| Root 密码   | `password`                                  |
-| 时区        | `Asia/Shanghai` (`CST-8`)                   |
-| LuCI 主题   | Argon(自定义背景图 `images/bg1.jpg`)        |
-| ttyd        | root 免登录(`/bin/login -f root`)           |
+| 项          | 默认值                                             |
+| ----------- | -------------------------------------------------- |
+| 目标平台    | x86-64 generic                                     |
+| 上游源码    | `immortalwrt/immortalwrt` @ `v25.12.1`             |
+| Rootfs 分区 | 1024 MB(`PART_SIZE`,可通过工作流 `part_size` 覆盖) |
+| LAN IP      | `192.168.10.1`(`IP_ADDRESS`)                       |
+| Root 密码   | `password`(`ROOT_PASSWORD`,首次登录必须改)         |
+| 时区        | `Asia/Shanghai` (`CST-8`)                          |
+| LuCI 主题   | Argon(自定义背景图 `images/bg1.jpg`)               |
+| ttyd        | root 免登录(`/bin/login -f root`)                  |
 
-完整 338 行配置见 [`x86-64/default.config`](./x86-64/default.config)。
+`x86-64/custom_config/standard.config` 是工作流矩阵实际加载的种子配置(含 PassWall / MoMo / nikki 等代理组件);`x86-64/default.config` 只在本地 `./build.sh` 走 `make menuconfig` 后由 `scripts/diffconfig.sh` 生成,CI 流程中不产生该文件。
 
 ---
 
@@ -68,14 +71,21 @@
 sudo apt update
 sudo bash scripts/init-env.sh
 
-# 2. 从零构建(首次会浅克隆上游源码)
+# 2. 从零构建(首次会浅克隆上游源码,并交互式 make menuconfig)
 ./build.sh
 
-# 3. 增量构建(复用已有 openwrt/ 目录)
+# 3. 增量构建(复用已有 openwrt/ 目录,先 make clean 再走 menuconfig)
 ./rebuild.sh
 ```
 
-构建产物输出到 `uploads/` 目录,包含 `.config` 与所有 `*wrt*.img.gz` 固件镜像。
+构建产物输出到 `uploads/` 目录(由 `build.sh` 中 `export UPLOAD_DIR=uploads` 决定),包含 `.config` 与所有 `*wrt*.img.gz` 固件镜像。
+
+> **与 CI 的差异**
+>
+> - CI 通过 `cp -f x86-64/custom_config/<name>.config .config && make defconfig` 直接注入配置;本地 `./build.sh` 与 `./rebuild.sh` 则走交互式 `make menuconfig`(无 TTY 环境下会失败)。
+> - CI 上传目录为 `upload/`(`workflows` 中 `env.UPLOAD_DIR: upload`,无 `s`),本地脚本使用 `uploads/`。
+> - `rebuild.sh` 只 `make clean`(保留工具链),不做 `dirclean`/`distclean`,如需完全重建请手动调整。
+> - 本地脚本会执行 `custom_scripts/collect_upload.sh`,产物文件名末尾会附加 `NAME_SUFFIX=walk6834`(CI 矩阵下后缀等于 `config_name`)。
 
 ---
 
